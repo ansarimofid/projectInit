@@ -1,20 +1,31 @@
 #!/usr/bin/env node
 
-console.log("Hello World");
-/*var fs = require("fs");
-var path = process.cwd() + "/test";
-fs.mkdir(path, function(error) {
-    if (error) {
-        console.error("mkdir error: " + error.message);
-    } else {
-        path += "/test2";
-        fs.mkdir(path, function(error) {
-            if (error) {
-                console.error("mkdir error: " + error.message);
-            } else {
-                console.log("Successfully built " + path);
-            }
-        });
-    }
-});
-*/
+var arg = process.argv.slice(2)[0];
+console.log("Argument:" + arg);
+
+
+if (arg == 'simpleHtmlProject') {
+    createSimpleHtmlProject();
+}
+else
+    return 0;
+
+
+function createSimpleHtmlProject() {
+    var fs = require("fs"),
+        currPath = process.cwd();
+    mkDir('css',currPath);
+    mkDir('img',currPath);
+    mkDir('js',currPath);
+}
+
+function mkDir(dirName,path){
+    var fs = require("fs");
+    fs.mkdir(path+'/'+dirName, function(err){
+        if (err){
+            console.log(err);
+            return 0;
+        }
+        return 1;
+    });
+}
