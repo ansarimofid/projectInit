@@ -12,7 +12,7 @@ else
 
 
 function createSimpleHtmlProject() {
-    var fs = require("fs"),
+    var fs = require("fs-extra"),
         currPath = process.cwd();
     mkDir('css',currPath);
     mkDir('img',currPath);
