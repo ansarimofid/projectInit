@@ -2,7 +2,6 @@
     "name": "projectinit",
     "version": "0.0.1",
     "description": "",
-    "main": "app.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -18,6 +17,6 @@
     "homepage": "https://github.com/ansarimofid/projectInit#readme",
     "preferGlobal": true,
     "bin": {
-        "projectInit":"bin/app.js"
+        "projectInit":"app.js"
     }
 }
