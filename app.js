@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require("fs-extra");
+var cheerio = require('cheerio');
 
 var arg = process.argv.slice(2)[0];
 console.log("Argument:" + arg);
@@ -10,6 +11,7 @@ if (arg == 'simpleHtmlProject') {
     createSimpleHtmlProject();
 } else
     return 0;
+
 
 
 /**
@@ -25,6 +27,7 @@ function createSimpleHtmlProject() {
     copyFile(path + '/lib/template/html/index.html', currPath + '/index.html');
     copyFile(path + '/lib/template/css/style.css', currPath + '/css/style.css');
     copyFile(path + '/lib/template/js/main.js', currPath + '/js/main.js');
+    linkCss(path + '/lib/template/html/index.html',currPath + '/index.html', 'css/style.css');
 }
 
 
@@ -59,4 +62,26 @@ function copyFile(src, dst) {
         }
         return 1;
     });
+}
+
+function linkCss(src,target, link) {
+
+    fs.open(src, 'r+', function(err, fd) {
+        if (err)
+            console.log(err);
+
+        fs.readFile(src, function(err, data) {
+            if (err)
+                console.log(err);
+
+            var $ = cheerio.load(data.toString());
+            $('head').append('<link rel="stylesheet" href='+link+'>');
+            console.log($.html());
+            fs.writeFile(target, $.html(), function(err){
+                if (err)
+                    console.log(err);
+            });
+        });
+    });
+
 }
