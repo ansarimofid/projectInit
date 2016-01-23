@@ -27,7 +27,7 @@ function createSimpleHtmlProject() {
     copyFile(path + '/lib/template/html/index.html', currPath + '/index.html');
     copyFile(path + '/lib/template/css/style.css', currPath + '/css/style.css');
     copyFile(path + '/lib/template/js/main.js', currPath + '/js/main.js');
-    linkCss(path + '/lib/template/html/index.html',currPath + '/index.html', 'css/style.css');
+    linkCss(currPath + '/index.html', 'css/style.css');
 }
 
 
@@ -55,29 +55,60 @@ function mkDir(dirName, path) {
  * @return {bool}     returns 1 on success else 1
  */
 function copyFile(src, dst) {
-    fs.copy(src, dst, function(err) {
-        if (err) {
-            console.log(err);
-            return 0;
-        }
-        return 1;
+    readStream = fs.createReadStream(src);
+    writeStream = fs.createWriteStream(dst);
+
+    readStream.on('error',function (err) {
+        console.log(err);
+        return 0;
     });
+    
+    writeStream.on('error',function (err) {
+        console.log(err);
+        return 0;
+    });
+
+    readStream.pipe(writeStream);
 }
 
-function linkCss(src,target, link) {
+function linkCss(target, link) {
+    // var fs =  require('fs-extra');
 
-    fs.open(src, 'r+', function(err, fd) {
-        if (err)
-            console.log(err);
-
-        fs.readFile(src, function(err, data) {
+    /*fs.open(target, 'r+', function(err, fd) {
             if (err)
                 console.log(err);
 
+            fs.readFile(target, function(err, data) {
+                if (err)
+                    console.log("Read Error");
+
+                var $ = cheerio.load(data.toString());
+                $('head').append('<link rel="stylesheet" href=' + link + '>');
+                console.log($.html());
+                fs.writeFile(target, $.html(), function(err) {
+                    if (err)
+                        console.log(err);
+                });
+            });
+    }, function (err) {
+        console.log('open Error');
+    });*/
+
+
+    fs.open(target, 'r+', function(err, fd) {
+        if (err) {
+            console.log(err+'\n'+target);
+            return 0;
+        }
+
+        fs.readFile(target, function(err, data) {
+            if (err)
+                console.log("Read Error");
+
             var $ = cheerio.load(data.toString());
-            $('head').append('<link rel="stylesheet" href='+link+'>');
+            $('head').append('<link rel="stylesheet" href=' + link + '>');
             console.log($.html());
-            fs.writeFile(target, $.html(), function(err){
+            fs.writeFile(target, $.html(), function(err) {
                 if (err)
                     console.log(err);
             });
