@@ -1,0 +1,21 @@
+{
+    "name": "simpleHtml",
+    "children": [{
+        "name": "css",
+        "file": ["style.css"],
+        "file": ["main.css"]
+    }, {
+        "name": "js",
+        "file": "main.js",
+        "children": [{
+            "name": "lib",
+            "children": [{
+                "name": "angular"
+            }, {
+                "name": "node"
+            }]
+        }]
+    }, {
+        "name": "img"
+    }]
+}
