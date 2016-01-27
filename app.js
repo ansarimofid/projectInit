@@ -7,10 +7,81 @@ var arg = process.argv.slice(2)[0];
 console.log("Argument:" + arg);
 
 
-if (arg == 'simpleHtmlProject') {
-    createSimpleHtmlProject();
+if (arg == 'simpleHtml') {
+    // createSimpleHtmlProject();
+    createProjectStructure('simpleHtml');
 } else
     return 0;
+
+function createProjectStructure(projectName){
+    var structure;
+    structure = loadStructure(projectName);
+    createFolderStructure(structure);
+}
+
+function createFolderStructure(jsonObject){
+
+    function traverseJson(object, currPath) {
+        var dirName;
+        if (typeof currPath === "undefined") {
+            dirName = '';
+        } else {
+            dirName = currPath + '/'+object.name;
+            mkDir(object.name,process.cwd()+currPath);
+        }
+
+        console.log(dirName);
+        for (var prop in object) {
+            if (prop == 'children') {
+                object.children.forEach(function(obj) {
+                    traverseJson(obj, dirName);
+                });
+            }
+        }
+    }
+
+    traverseJson(jsonObject);
+}   
+
+
+function loadStructure(projectName) {
+    var struct;
+
+    /*fs.readFile(__dirname + "/lib/projectStructure/" + projectName + ".json", 'utf8', function(err, data) {
+        if (err) {
+            console.log(err);
+        }
+        struct = JSON.parse(data);
+        // console.log(struct);
+
+        function traverseJson(object, currPath) {
+            var dirName;
+            if (typeof currPath === "undefined") {
+                dirName = '';
+            } else {
+                dirName = currPath + '/'+object.name;
+                mkDir(object.name,process.cwd()+currPath);
+            }
+
+            console.log(dirName);
+            for (var prop in object) {
+                if (prop == 'children') {
+                    object.children.forEach(function(obj) {
+                        traverseJson(obj, dirName);
+                    });
+                }
+            }
+        }
+        traverseJson(structure);
+        console.log(struct);
+
+        // return data;
+        return {"name":"Janju"};
+    });*/
+
+    struct = JSON.parse(fs.readFileSync(__dirname + "/lib/projectStructure/" + projectName + ".json", 'utf8'));
+    return struct;
+}
 
 
 
@@ -27,7 +98,7 @@ function createSimpleHtmlProject() {
     copyFile(path + '/lib/template/html/index.html', currPath + '/index.html');
     copyFile(path + '/lib/template/css/style.css', currPath + '/css/style.css');
     copyFile(path + '/lib/template/js/main.js', currPath + '/js/main.js');
-    linkCss(currPath + '/index.html', 'css/style.css');
+    linkCss({});
 }
 
 
@@ -58,12 +129,12 @@ function copyFile(src, dst) {
     readStream = fs.createReadStream(src);
     writeStream = fs.createWriteStream(dst);
 
-    readStream.on('error',function (err) {
+    readStream.on('error', function(err) {
         console.log(err);
         return 0;
     });
-    
-    writeStream.on('error',function (err) {
+
+    writeStream.on('error', function(err) {
         console.log(err);
         return 0;
     });
@@ -71,33 +142,10 @@ function copyFile(src, dst) {
     readStream.pipe(writeStream);
 }
 
-function linkCss(target, link) {
-    // var fs =  require('fs-extra');
-
-    /*fs.open(target, 'r+', function(err, fd) {
-            if (err)
-                console.log(err);
-
-            fs.readFile(target, function(err, data) {
-                if (err)
-                    console.log("Read Error");
-
-                var $ = cheerio.load(data.toString());
-                $('head').append('<link rel="stylesheet" href=' + link + '>');
-                console.log($.html());
-                fs.writeFile(target, $.html(), function(err) {
-                    if (err)
-                        console.log(err);
-                });
-            });
-    }, function (err) {
-        console.log('open Error');
-    });*/
-
-
+function linkCss(targetAndLink) {
     fs.open(target, 'r+', function(err, fd) {
         if (err) {
-            console.log(err+'\n'+target);
+            console.log(err + '\n' + target);
             return 0;
         }
 
