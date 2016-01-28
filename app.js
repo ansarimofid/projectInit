@@ -2,32 +2,66 @@
 
 var fs = require("fs-extra");
 var cheerio = require('cheerio');
+var async = require('async');
 
 var arg = process.argv.slice(2)[0];
 console.log("Argument:" + arg);
 
 
 if (arg == 'simpleHtml') {
-    // createSimpleHtmlProject();
     createProjectStructure('simpleHtml');
 } else
     return 0;
 
-function createProjectStructure(projectName){
+/**
+ * Creates the complete project structure
+ * @param  {string} projectName :Name of the project
+ * @return {bool}             return true on success else false
+ */
+function createProjectStructure(projectName) {
     var structure;
-    structure = loadStructure(projectName);
-    createFolderStructure(structure);
+
+    loadStructure(projectName,function(err,structure){
+        if (err) {
+            console.log(err);
+            return 0;
+        }
+        console.log(structure);
+        createFolderStructure(structure);
+    });
 }
 
-function createFolderStructure(jsonObject){
+
+/**
+ * Loads the Project Structure from Json file
+ * @param  {string}   projectName :name of project
+ * @param  {Function} callback    :call specified function
+ */
+function loadStructure(projectName,callback) {
+    fs.readFile(__dirname + "/lib/projectStructure/" + projectName + ".json", 'utf8', function(err, data) {
+        if (err) {
+            console.log(err);
+            callback(err);
+        }
+        struct = JSON.parse(data);
+        callback(null,struct);
+    });
+}
+
+/**
+ * Creates folder structure recursively from jsonObject 
+ * @param  {object} jsonObject :hierarchy of Folder
+ * @return {bool}            return true on sucess else false 
+ */
+function createFolderStructure(jsonObject) {
 
     function traverseJson(object, currPath) {
         var dirName;
         if (typeof currPath === "undefined") {
             dirName = '';
         } else {
-            dirName = currPath + '/'+object.name;
-            mkDir(object.name,process.cwd()+currPath);
+            dirName = currPath + '/' + object.name;
+            mkDir(object.name, process.cwd() + currPath);
         }
 
         console.log(dirName);
@@ -41,46 +75,6 @@ function createFolderStructure(jsonObject){
     }
 
     traverseJson(jsonObject);
-}   
-
-
-function loadStructure(projectName) {
-    var struct;
-
-    /*fs.readFile(__dirname + "/lib/projectStructure/" + projectName + ".json", 'utf8', function(err, data) {
-        if (err) {
-            console.log(err);
-        }
-        struct = JSON.parse(data);
-        // console.log(struct);
-
-        function traverseJson(object, currPath) {
-            var dirName;
-            if (typeof currPath === "undefined") {
-                dirName = '';
-            } else {
-                dirName = currPath + '/'+object.name;
-                mkDir(object.name,process.cwd()+currPath);
-            }
-
-            console.log(dirName);
-            for (var prop in object) {
-                if (prop == 'children') {
-                    object.children.forEach(function(obj) {
-                        traverseJson(obj, dirName);
-                    });
-                }
-            }
-        }
-        traverseJson(structure);
-        console.log(struct);
-
-        // return data;
-        return {"name":"Janju"};
-    });*/
-
-    struct = JSON.parse(fs.readFileSync(__dirname + "/lib/projectStructure/" + projectName + ".json", 'utf8'));
-    return struct;
 }
 
 
