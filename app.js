@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-var fs = require("fs-extra");
+var fs = require("fs");
 var cheerio = require('cheerio');
-var async = require('async');
-
 var arg = process.argv.slice(2)[0];
 console.log("Argument:" + arg);
 
