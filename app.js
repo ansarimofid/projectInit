@@ -2,8 +2,11 @@
 
 var fs = require("fs");
 var cheerio = require('cheerio');
+var path =require('path');
 var arg = process.argv.slice(2)[0];
 console.log("Argument:" + arg);
+
+updateFileMap();//Updates The Template fileMap
 
 
 if (arg == 'simpleHtml') {
@@ -155,4 +158,81 @@ function linkCss(targetAndLink) {
         });
     });
 
+}
+
+/**
+ * Updates the File map of template directory
+ */
+function updateFileMap(){
+    var dir =path.resolve(__dirname,"lib/template");
+    recursiveDirList(dir, function(err, result) {
+        var data = JSON.stringify(result, null, 4);
+        fs.writeFile(path.resolve(dir,'fileMap.json'), data, {
+            flag: 'w'
+        }, function(err) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+        });
+    });
+}
+
+/**
+ * Recursively Returns File list in directory
+ * @param  {string}   dir      :directory to look for files
+ * @param  {Function} callback :should contain two param (error,result)
+ * @return {[type]}            :returns Javascript Object Containing file List
+ */
+function recursiveDirList(dir, callback) {
+    var hashMap = {};
+    fs.readdir(dir, function(err, items) {
+        if (err) {
+            console.log(err);
+            return callback(err);
+        }
+        var listLength = items.length;
+        if (!listLength) {
+            return callback(null, hashMap);
+        }
+        items.forEach(function(file) {
+            var name = file;
+            file = path.resolve(dir, file);
+            fs.stat(file, function(err, stat) {
+                if (stat && stat.isDirectory()) {
+                    recursiveDirList(file, function(err, res) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        hashMap = mergeObject(hashMap, res);
+                        if (!--listLength) {
+                            callback(null, hashMap);
+                        }
+                        return;
+                    });
+                } else if (stat && stat.isFile()) {
+                    hashMap[name] = file;
+                    if (!--listLength)
+                        callback(null, hashMap);
+                }
+            });
+        });
+    });
+}
+
+
+/**
+ * Merges two Object
+ * @param  {Object} target :Target object 
+ * @param  {Object} src    :Source object
+ * @return {Object}        :Object containing merged objects
+ */
+function mergeObject(target, src) {
+    for (var key in src) {
+        if (src.hasOwnProperty(key)) {
+            target[key] = src[key];
+        }
+    }
+    return target;
 }
