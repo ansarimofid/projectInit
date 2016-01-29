@@ -2,11 +2,11 @@
 
 var fs = require("fs");
 var cheerio = require('cheerio');
-var path =require('path');
+var path = require('path');
 var arg = process.argv.slice(2)[0];
 console.log("Argument:" + arg);
 
-updateFileMap();//Updates The Template fileMap
+updateFileMap(); //Updates The Template fileMap
 
 
 if (arg == 'simpleHtml') {
@@ -22,12 +22,11 @@ if (arg == 'simpleHtml') {
 function createProjectStructure(projectName) {
     var structure;
 
-    loadStructure(projectName,function(err,structure){
+    loadStructure(projectName, function(err, structure) {
         if (err) {
             console.log(err);
             return 0;
         }
-        console.log(structure);
         createFolderStructure(structure);
     });
 }
@@ -38,14 +37,14 @@ function createProjectStructure(projectName) {
  * @param  {string}   projectName :name of project
  * @param  {Function} callback    :call specified function
  */
-function loadStructure(projectName,callback) {
+function loadStructure(projectName, callback) {
     fs.readFile(__dirname + "/lib/projectStructure/" + projectName + ".json", 'utf8', function(err, data) {
         if (err) {
             console.log(err);
             callback(err);
         }
         struct = JSON.parse(data);
-        callback(null,struct);
+        callback(null, struct);
     });
 }
 
@@ -55,11 +54,11 @@ function loadStructure(projectName,callback) {
  * @return {bool}            return true on sucess else false 
  */
 function createFolderStructure(jsonObject) {
-
     function traverseJson(object, currPath) {
         var dirName;
         if (typeof currPath === "undefined") {
             dirName = '';
+            currPath = '';
         } else {
             dirName = currPath + '/' + object.name;
             mkDir(object.name, process.cwd() + currPath);
@@ -70,6 +69,25 @@ function createFolderStructure(jsonObject) {
             if (prop == 'children') {
                 object.children.forEach(function(obj) {
                     traverseJson(obj, dirName);
+                });
+            }
+            if (prop == 'file') {
+                object.file.forEach(function(file) {
+                    getFileMap(function(err, data) {//GEting FileMap and copying according to Specified destination
+                        var name;
+                        if (typeof data[file] == 'undefined') {
+                            return;
+                        }
+                        if (typeof object.name == 'undefined') {
+                            name = '';
+                        } else
+                            name = object.name;
+
+                        var src = data[file];
+                        var dst = process.cwd() + currPath + '/' + name + '/' + file;
+                        console.log(currPath + '/' + name + '/' + file);
+                        copyFile(data[file], dst);
+                    });
                 });
             }
         }
@@ -118,7 +136,7 @@ function mkDir(dirName, path) {
  * Copies file or directory from source to destination
  * @param  {string} src source of file/directory
  * @param  {string} dst destination of new file/directory
- * @return {bool}     returns 1 on success else 1
+ * @return {bool}     returns 1 on success else 0
  */
 function copyFile(src, dst) {
     readStream = fs.createReadStream(src);
@@ -137,6 +155,25 @@ function copyFile(src, dst) {
     readStream.pipe(writeStream);
 }
 
+/**
+ * Reads the filemap.json and returns data as json
+ * @param  {Function} callback :callback(err,result)
+ */
+function getFileMap(callback) {
+    var dir = path.resolve(__dirname, "lib/template", "fileMap.json");
+
+    fs.readFile(dir, function(err, data) {
+        if (err) {
+            console.log("Read Error");
+            callback(err);
+            return 0;
+        }
+
+        data = JSON.parse(data);
+        callback(null, data);
+    });
+}
+
 function linkCss(targetAndLink) {
     fs.open(target, 'r+', function(err, fd) {
         if (err) {
@@ -145,8 +182,10 @@ function linkCss(targetAndLink) {
         }
 
         fs.readFile(target, function(err, data) {
-            if (err)
+            if (err) {
                 console.log("Read Error");
+                return 0;
+            }
 
             var $ = cheerio.load(data.toString());
             $('head').append('<link rel="stylesheet" href=' + link + '>');
@@ -163,11 +202,11 @@ function linkCss(targetAndLink) {
 /**
  * Updates the File map of template directory
  */
-function updateFileMap(){
-    var dir =path.resolve(__dirname,"lib/template");
+function updateFileMap() {
+    var dir = path.resolve(__dirname, "lib/template");
     recursiveDirList(dir, function(err, result) {
         var data = JSON.stringify(result, null, 4);
-        fs.writeFile(path.resolve(dir,'fileMap.json'), data, {
+        fs.writeFile(path.resolve(dir, 'fileMap.json'), data, {
             flag: 'w'
         }, function(err) {
             if (err) {
