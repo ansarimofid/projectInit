@@ -73,12 +73,10 @@ function createFolderStructure(jsonObject) {
             }
             if (prop == 'file') {
                 object.file.forEach(function(file) {
-                    getFileMap(function(err, data) {//GEting FileMap and copying according to Specified destination
+                    getFileMap(function(err, data) { //GEting FileMap and copying according to Specified destination
                         var name;
-                        if (typeof data[file] == 'undefined') {
-                            return;
-                        }
-                        if (typeof object.name == 'undefined') {
+
+                         if (typeof object.name == 'undefined') {
                             name = '';
                         } else
                             name = object.name;
@@ -86,6 +84,23 @@ function createFolderStructure(jsonObject) {
                         var src = data[file];
                         var dst = process.cwd() + currPath + '/' + name + '/' + file;
                         console.log(currPath + '/' + name + '/' + file);
+
+                        if (typeof data[file] == 'undefined') {
+                            fs.open(dst,"wx",function(err,fd){
+                                if (err) {
+                                    console.log(err);
+                                    return;
+                                }
+                                    
+                                fs.close(fd,function(err){
+                                    if (err) {
+                                        console.log(err);
+                                        return;
+                                    }
+                                });
+                            });
+                            return;
+                        }
                         copyFile(data[file], dst);
                     });
                 });
