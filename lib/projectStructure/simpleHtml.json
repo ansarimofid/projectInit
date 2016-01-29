@@ -1,12 +1,12 @@
 {
-    "name": "simpleHtml",
+    "TemplateName": "simpleHtml",
+    "file":["index.html"],
     "children": [{
         "name": "css",
-        "file": ["style.css"],
-        "file": ["main.css"]
+        "file": ["style.css","test.css"]
     }, {
         "name": "js",
-        "file": "main.js",
+        "file": ["main.js"],
         "children": [{
             "name": "lib",
             "children": [{

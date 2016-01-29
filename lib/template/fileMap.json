@@ -1,5 +1,6 @@
 {
+    "fileMap.json": "d:\\Projects\\apps\\projectInit\\lib\\template\\fileMap.json",
+    "style.css": "d:\\Projects\\apps\\projectInit\\lib\\template\\css\\style.css",
     "index.html": "d:\\Projects\\apps\\projectInit\\lib\\template\\html\\index.html",
-    "main.js": "d:\\Projects\\apps\\projectInit\\lib\\template\\js\\main.js",
-    "style.css": "d:\\Projects\\apps\\projectInit\\lib\\template\\css\\style.css"
+    "main.js": "d:\\Projects\\apps\\projectInit\\lib\\template\\js\\main.js"
 }
