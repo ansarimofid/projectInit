@@ -25,7 +25,7 @@ if (arg) {
 function createProjectStructure(projectName) {
     var structure;
 
-    loadStructure(projectName, function(err, structure) {
+    loadJson(__dirname + "/lib/projectStructure/" + projectName + ".json", function(err, structure) {
         if (err) {
             console.log(err);
             return 0;
@@ -36,12 +36,12 @@ function createProjectStructure(projectName) {
 
 
 /**
- * Loads the Project Structure from Json file
- * @param  {string}   projectName :name of project
+ * Parses the Json file
+ * @param  {string}   path :path to json file
  * @param  {Function} callback    :call specified function
  */
-function loadStructure(projectName, callback) {
-    fs.readFile(__dirname + "/lib/projectStructure/" + projectName + ".json", 'utf8', function(err, data) {
+function loadJson(path, callback) {
+    fs.readFile(path, 'utf8', function(err, data) {
         if (err) {
             console.log(err);
             callback(err);
