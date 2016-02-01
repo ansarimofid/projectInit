@@ -4,13 +4,16 @@ var fs = require("fs");
 var cheerio = require('cheerio');
 var path = require('path');
 var arg = process.argv.slice(2)[0];
+var program=require('commander');
 console.log("Argument:" + arg);
 
+program.version('v0.0.1')
+        .parse(process.argv);
 updateFileMap(); //Updates The Template fileMap
 
 
-if (arg == 'simpleHtml') {
-    createProjectStructure('simpleHtml');
+if (arg) {
+    createProjectStructure(arg);
 } else
     return 0;
 
@@ -42,6 +45,7 @@ function loadStructure(projectName, callback) {
         if (err) {
             console.log(err);
             callback(err);
+            return;
         }
         struct = JSON.parse(data);
         callback(null, struct);
