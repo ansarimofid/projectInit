@@ -189,7 +189,7 @@ function getFileMap(callback) {
     });
 }
 
-function linkCss(targetAndLink) {
+function linkCss(target,link) {
     fs.open(target, 'r+', function(err, fd) {
         if (err) {
             console.log(err + '\n' + target);
