@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 
-var fs = require("fs");
+var fs = require("fs-extra");
 var cheerio = require('cheerio');
 var path = require('path');
 var arg = process.argv.slice(2)[0];
-var program=require('commander');
+var program = require('commander');
 console.log("Argument:" + arg);
 
 program.version('v0.0.1')
-        .parse(process.argv);
+    .parse(process.argv);
 updateFileMap(); //Updates The Template fileMap
-
 
 if (arg) {
     createProjectStructure(arg);
@@ -53,6 +52,25 @@ function loadJson(path, callback) {
 }
 
 /**
+ * Checks if certain library is available or not
+ * @param  {string}   libname  :name of library to check for
+ * @param  {Function} callback
+ */
+function isLibAvialable(libname, callback) {
+    loadJson(path.resolve(__dirname, 'package.json'), function(err, data) {
+        if (err) {
+            console.log(err);
+            callback(err);
+            return;
+        }
+        if (data.dependencies[libname])
+            callback(null, 1);
+        else
+            callback(null, 0);
+    });
+}
+
+/**
  * Creates folder structure recursively from jsonObject 
  * @param  {object} jsonObject :hierarchy of Folder
  * @return {bool}            return true on sucess else false 
@@ -73,14 +91,13 @@ function createFolderStructure(jsonObject) {
             if (prop == 'children') {
                 object.children.forEach(function(obj) {
                     traverseJson(obj, dirName);
-                });
-            }
-            if (prop == 'file') {
+                })
+            } else if (prop == 'file') {
                 object.file.forEach(function(file) {
                     getFileMap(function(err, data) { //GEting FileMap and copying according to Specified destination
                         var name;
 
-                         if (typeof object.name == 'undefined') {
+                        if (typeof object.name == 'undefined') {
                             name = '';
                         } else
                             name = object.name;
@@ -90,13 +107,13 @@ function createFolderStructure(jsonObject) {
                         console.log(currPath + '/' + name + '/' + file);
 
                         if (typeof data[file] == 'undefined') {
-                            fs.open(dst,"wx",function(err,fd){
+                            fs.open(dst, "wx", function(err, fd) {
                                 if (err) {
                                     console.log(err);
                                     return;
                                 }
-                                    
-                                fs.close(fd,function(err){
+
+                                fs.close(fd, function(err) {
                                     if (err) {
                                         console.log(err);
                                         return;
@@ -106,6 +123,22 @@ function createFolderStructure(jsonObject) {
                             return;
                         }
                         copyFile(data[file], dst);
+                    });
+                });
+            } else if (prop == 'lib' && typeof object.lib == 'object') {
+                var dst = process.cwd() + currPath+'/'+ object.name;
+                mkDir("lib", dst);
+                object.lib.forEach(function(lib) {
+                    isLibAvialable(lib, function(err, res) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        if (res) {
+                            copyFile(__dirname+"/node_modules"+'/'+lib, dst + '/lib/' + lib);
+                            console.log(currPath+'/'+ object.name+ '/lib/' + lib);
+                            console.log("Lib" + lib + ";Res" + res);
+                        }
                     });
                 });
             }
@@ -157,21 +190,15 @@ function mkDir(dirName, path) {
  * @param  {string} dst destination of new file/directory
  * @return {bool}     returns 1 on success else 0
  */
+
 function copyFile(src, dst) {
-    readStream = fs.createReadStream(src);
-    writeStream = fs.createWriteStream(dst);
-
-    readStream.on('error', function(err) {
-        console.log(err);
-        return 0;
+    fs.copy(src, dst, function(err) {
+        if (err) {
+            console.log(err);
+            return 0;
+        }
+        return 1;
     });
-
-    writeStream.on('error', function(err) {
-        console.log(err);
-        return 0;
-    });
-
-    readStream.pipe(writeStream);
 }
 
 /**
@@ -193,7 +220,7 @@ function getFileMap(callback) {
     });
 }
 
-function linkCss(target,link) {
+function linkCss(target, link) {
     fs.open(target, 'r+', function(err, fd) {
         if (err) {
             console.log(err + '\n' + target);
