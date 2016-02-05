@@ -5,11 +5,39 @@ var cheerio = require('cheerio');
 var path = require('path');
 var arg = process.argv.slice(2)[0];
 var program = require('commander');
+var minimist = require('minimist');
+var mArgv = minimist(process.argv.slice(2));
 console.log("Argument:" + arg);
 
 program.version('v0.0.1')
+	.option('-L, --lib','Add Library')
     .parse(process.argv);
+
+/**
+ * Adds library to current directory directly from cmd arguments.
+ */
+if (mArgv.lib) {
+	var libArr = mArgv.lib.split(',');
+	console.log(libArr);
+	libArr.forEach(function(lib){
+		isLibAvialable(lib,function(err,res){
+			if (err) {
+				console.log(err);
+				return;
+			}
+			if (res) {
+				copyLib(lib,process.cwd());
+			}
+			else
+				console.log("Error: Library "+"'"+lib+"'"+" Doesn't Exist");
+		});
+
+	});
+	return;
+}
+
 updateFileMap(); //Updates The Template fileMap
+
 
 if (arg) {
     createProjectStructure(arg);
@@ -134,11 +162,8 @@ function createFolderStructure(jsonObject) {
                             console.log(err);
                             return;
                         }
-                        if (res) {
-                            copyFile(__dirname+"/node_modules"+'/'+lib, dst + '/lib/' + lib);
-                            console.log(currPath+'/'+ object.name+ '/lib/' + lib);
-                            console.log("Lib" + lib + ";Res" + res);
-                        }
+                        if (res)
+	                       	console.log(currPath+'/'+ object.name+ '/lib/' + lib);
                     });
                 });
             }
@@ -148,6 +173,17 @@ function createFolderStructure(jsonObject) {
     traverseJson(jsonObject);
 }
 
+/**
+ * Copies the library to specified destination
+ * @param  {string} lib [name of library to import]
+ * @param  {string} dst [path to destination folder]
+ * @return {bool}  return tru on success else false
+ */
+function copyLib(lib,dst){
+	if (!copyFile(__dirname+"/node_modules"+'/'+lib, dst + '/' + lib))
+		return 0;
+	return 1;	
+}
 
 /**
  * Creates Directory us FileSystem
