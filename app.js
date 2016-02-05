@@ -149,24 +149,6 @@ function createFolderStructure(jsonObject) {
 }
 
 
-
-/**
- * Creates Directory For Simple Html5 Project
- * @return {boolean} return 1 on success else 0
- */
-function createSimpleHtmlProject() {
-    var currPath = process.cwd(),
-        path = __dirname;
-    mkDir('css', currPath);
-    mkDir('img', currPath);
-    mkDir('js', currPath);
-    copyFile(path + '/lib/template/html/index.html', currPath + '/index.html');
-    copyFile(path + '/lib/template/css/style.css', currPath + '/css/style.css');
-    copyFile(path + '/lib/template/js/main.js', currPath + '/js/main.js');
-    linkCss({});
-}
-
-
 /**
  * Creates Directory us FileSystem
  * @param  {string} dirName Name of The Directory to be Created
