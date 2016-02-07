@@ -7,10 +7,14 @@ var arg = process.argv.slice(2)[0];
 var program = require('commander');
 var minimist = require('minimist');
 var mArgv = minimist(process.argv.slice(2));
+var exec = require('child_process').exec;
+
 console.log("Argument:" + arg);
 
 program.version('v0.0.1')
-	.option('-L, --lib','Add Library')
+    .option('-L, --lib','Load Library')
+    .option('-LA, --libAdd','Add Library')
+	.option('-LR, --libRemove','Remove Library')
     .parse(process.argv);
 
 /**
@@ -36,6 +40,24 @@ if (mArgv.lib) {
 	return;
 }
 
+if (mArgv.libAdd) {
+    var libArr=mArgv.libAdd.split(',');
+    console.log(libArr);
+    libArr.forEach(function(lib){
+        isLibAvialable(lib,function(err,res) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            if (!res)
+                execCmd('npm install '+lib+' --save');
+            else
+                console.log(lib +" Already Exist");
+        });
+    });
+    return;
+}
+
 updateFileMap(); //Updates The Template fileMap
 
 
@@ -43,6 +65,20 @@ if (arg) {
     createProjectStructure(arg);
 } else
     return 0;
+
+
+function execCmd (cmd) {
+    process.chdir(__dirname);
+    exec(cmd,function (err,stdout,stderr) {
+       
+        if(err){
+            console.log('Error:' + err);
+            return;
+        }
+            console.log(stderr);
+            console.log(stdout);
+    });
+}
 
 /**
  * Creates the complete project structure
