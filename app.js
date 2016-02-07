@@ -238,31 +238,6 @@ function getFileMap(callback) {
     });
 }
 
-function linkCss(target, link) {
-    fs.open(target, 'r+', function(err, fd) {
-        if (err) {
-            console.log(err + '\n' + target);
-            return 0;
-        }
-
-        fs.readFile(target, function(err, data) {
-            if (err) {
-                console.log("Read Error");
-                return 0;
-            }
-
-            var $ = cheerio.load(data.toString());
-            $('head').append('<link rel="stylesheet" href=' + link + '>');
-            console.log($.html());
-            fs.writeFile(target, $.html(), function(err) {
-                if (err)
-                    console.log(err);
-            });
-        });
-    });
-
-}
-
 /**
  * Updates the File map of template directory
  */
