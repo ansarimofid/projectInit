@@ -19,6 +19,7 @@ program.version('v0.0.1')
 
 /**
  * Adds library to current directory directly from cmd arguments.
+ * Trigger with flag --lib
  */
 if (mArgv.lib) {
 	var libArr = mArgv.lib.split(',');
@@ -40,6 +41,11 @@ if (mArgv.lib) {
 	return;
 }
 
+
+/**
+ * Add new packages to Library collection
+ * Trigger with flag --libAdd
+ */
 if (mArgv.libAdd) {
     var libArr=mArgv.libAdd.split(',');
     console.log(libArr);
@@ -53,6 +59,28 @@ if (mArgv.libAdd) {
                 execCmd('npm install '+lib+' --save');
             else
                 console.log(lib +" Already Exist");
+        });
+    });
+    return;
+}
+
+/**
+ * Removes packages from Library collection
+ * Trigger with flag --libRemove
+ */
+if (mArgv.libRemove) {
+    var libArr=mArgv.libRemove.split(',');
+    console.log(libArr);
+    libArr.forEach(function(lib){
+        isLibAvialable(lib,function(err,res) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            if (res)
+                execCmd('npm uninstall '+lib+' --save');
+            else
+                console.log(lib +" Doesn't Exist");
         });
     });
     return;
