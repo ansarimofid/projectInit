@@ -12,9 +12,10 @@ var exec = require('child_process').exec;
 console.log("Argument:" + arg);
 
 program.version('v0.0.1')
-    .option('-L, --lib','Load Library')
-    .option('-LA, --libAdd','Add Library')
-	.option('-LR, --libRemove','Remove Library')
+    .option('-L, --lib','Load Library to current directory')
+    .option('-LA, --libAdd','Add Library to collection')
+    .option('-LR, --libRemove','Remove Library from Collection')
+	.option('-LR, --libUpdate','Remove Library')
     .parse(process.argv);
 
 /**
@@ -86,15 +87,32 @@ if (mArgv.libRemove) {
     return;
 }
 
+
+/**
+ * trigger with flag --libUpdate
+ * Updates package.json dependencies to latest
+ */
+if (mArgv.libUpdate) {
+    execCmd('ncu -u --loglevel verbose --packageFile package.json');
+    return;
+}
+
 updateFileMap(); //Updates The Template fileMap
 
-
+/**
+ * Trigger with CLI argument
+ * Creates Directory Structure
+ */
 if (arg) {
     createProjectStructure(arg);
 } else
     return 0;
 
 
+/**
+ * Executes exec command
+ * @param  {string} cmd [terminal command]
+ */
 function execCmd (cmd) {
     process.chdir(__dirname);
     exec(cmd,function (err,stdout,stderr) {
