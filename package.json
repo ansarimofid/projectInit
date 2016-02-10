@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall":"npm install -g npm-check-updates"
+    "preinstall": "npm install -g npm-check-updates"
   },
   "repository": {
     "type": "git",
