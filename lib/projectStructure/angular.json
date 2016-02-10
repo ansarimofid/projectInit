@@ -1,0 +1,35 @@
+{
+    "TemplateName": "angular",
+    "children": [{
+        "name": "app",
+        "file": ["app.js"],
+        "children": [{
+            "name": "controllers",
+            "file": ["mainController.js"]
+        }, {
+            "name": "directives",
+            "file": ["mainDirectives.js"]
+        }, {
+            "name": "services",
+            "file": ["userService.js", "itemService.js"]
+        }]
+    }, {
+        "name": "views",
+        "file": ["mainView.html", "index.html"]
+    }, {
+        "name": "assets",
+        "children": [{
+            "name": "img"
+        }, {
+            "name": "css",
+            "file": ["style.css"]
+        }, {
+            "name": "js",
+            "file": ["main.js"]
+        }, {
+            "name": "libs",
+            "lib": ["angular", "bootstrap", "jquery"]
+        }]
+    }],
+    "credit": "https://scotch.io/tutorials/angularjs-best-practices-directory-structure"
+}
