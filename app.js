@@ -12,10 +12,10 @@ var exec = require('child_process').exec;
 console.log("Argument:" + arg);
 
 program.version('v0.0.1')
-    .option('-L, --lib','Load Library to current directory')
-    .option('-LA, --libAdd','Add Library to collection')
-    .option('-LR, --libRemove','Remove Library from Collection')
-	.option('-LR, --libUpdate','Remove Library')
+    .option('-L, --lib', 'Load Library to current directory')
+    .option('-LA, --libAdd', 'Add Library to collection')
+    .option('-LR, --libRemove', 'Remove Library from Collection')
+    .option('-LR, --libUpdate', 'Remove Library')
     .parse(process.argv);
 
 /**
@@ -23,23 +23,22 @@ program.version('v0.0.1')
  * Trigger with flag --lib
  */
 if (mArgv.lib) {
-	var libArr = mArgv.lib.split(',');
-	console.log(libArr);
-	libArr.forEach(function(lib){
-		isLibAvialable(lib,function(err,res){
-			if (err) {
-				console.log(err);
-				return;
-			}
-			if (res) {
-				copyLib(lib,process.cwd());
-			}
-			else
-				console.log("Error: Library "+"'"+lib+"'"+" Doesn't Exist");
-		});
+    var libArr = mArgv.lib.split(',');
+    console.log(libArr);
+    libArr.forEach(function(lib) {
+        isLibAvialable(lib, function(err, res) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            if (res) {
+                copyLib(lib, process.cwd());
+            } else
+                console.log("Error: Library " + "'" + lib + "'" + " Doesn't Exist");
+        });
 
-	});
-	return;
+    });
+    return;
 }
 
 
@@ -48,18 +47,18 @@ if (mArgv.lib) {
  * Trigger with flag --libAdd
  */
 if (mArgv.libAdd) {
-    var libArr=mArgv.libAdd.split(',');
+    var libArr = mArgv.libAdd.split(',');
     console.log(libArr);
-    libArr.forEach(function(lib){
-        isLibAvialable(lib,function(err,res) {
+    libArr.forEach(function(lib) {
+        isLibAvialable(lib, function(err, res) {
             if (err) {
                 console.error(err);
                 return;
             }
             if (!res)
-                execCmd('npm install '+lib+' --save');
+                execCmd('npm install ' + lib + ' --save');
             else
-                console.log(lib +" Already Exist");
+                console.log(lib + " Already Exist");
         });
     });
     return;
@@ -70,18 +69,18 @@ if (mArgv.libAdd) {
  * Trigger with flag --libRemove
  */
 if (mArgv.libRemove) {
-    var libArr=mArgv.libRemove.split(',');
+    var libArr = mArgv.libRemove.split(',');
     console.log(libArr);
-    libArr.forEach(function(lib){
-        isLibAvialable(lib,function(err,res) {
+    libArr.forEach(function(lib) {
+        isLibAvialable(lib, function(err, res) {
             if (err) {
                 console.error(err);
                 return;
             }
             if (res)
-                execCmd('npm uninstall '+lib+' --save');
+                execCmd('npm uninstall ' + lib + ' --save');
             else
-                console.log(lib +" Doesn't Exist");
+                console.log(lib + " Doesn't Exist");
         });
     });
     return;
@@ -113,16 +112,16 @@ if (arg) {
  * Executes exec command
  * @param  {string} cmd [terminal command]
  */
-function execCmd (cmd) {
+function execCmd(cmd) {
     process.chdir(__dirname);
-    exec(cmd,function (err,stdout,stderr) {
-       
-        if(err){
+    exec(cmd, function(err, stdout, stderr) {
+
+        if (err) {
             console.log('Error:' + err);
             return;
         }
-            console.log(stderr);
-            console.log(stdout);
+        console.log(stderr);
+        console.log(stdout);
     });
 }
 
@@ -236,16 +235,18 @@ function createFolderStructure(jsonObject) {
                     });
                 });
             } else if (prop == 'lib' && typeof object.lib == 'object') {
-                var dst = process.cwd() + currPath+'/'+ object.name;
-                mkDir("lib", dst);
+                var dst = process.cwd() + currPath + '/' + object.name;
+                // mkDir("lib", dst);
                 object.lib.forEach(function(lib) {
                     isLibAvialable(lib, function(err, res) {
                         if (err) {
                             console.log(err);
                             return;
                         }
-                        if (res)
-	                       	console.log(currPath+'/'+ object.name+ '/lib/' + lib);
+                        if (res) {
+                            copyLib(lib, dst);
+                            console.log(currPath + '/' + object.name + '/lib/' + lib);
+                        }
                     });
                 });
             }
@@ -261,10 +262,10 @@ function createFolderStructure(jsonObject) {
  * @param  {string} dst [path to destination folder]
  * @return {bool}  return tru on success else false
  */
-function copyLib(lib,dst){
-	if (!copyFile(__dirname+"/node_modules"+'/'+lib, dst + '/' + lib))
-		return 0;
-	return 1;	
+function copyLib(lib, dst) {
+    if (!copyFile(__dirname + "/node_modules" + '/' + lib, dst + '/' + lib))
+        return 0;
+    return 1;
 }
 
 /**
