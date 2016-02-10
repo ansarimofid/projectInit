@@ -1,0 +1,25 @@
+{
+    "TemplateName": "simpleHtml",
+    "file": ["index.html","_config.yml",".jekyll-metadata"],
+    "children": [{
+        "name": "_includes",
+        "file": ["footer.html","header.html"]
+    }, {
+        "name": "_layouts",
+        "file": ["default.html","post.html"]
+    }, {
+        "name": "_posts",
+        "file":["2016-02-10-Hello-world.md"]
+    }, {
+        "name": "_data",
+        "file":["members.yml"]
+    }, {
+        "name": "css",
+        "file":["style.css"]
+    }, {
+        "name": "js",
+        "file":["main.js"]
+    }, {
+        "name": "_site"
+    }]
+}
