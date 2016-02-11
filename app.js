@@ -16,6 +16,7 @@ program.version('v0.0.1')
     .option('-LA, --libAdd', 'Add Library to collection')
     .option('-LR, --libRemove', 'Remove Library from Collection')
     .option('-LR, --libUpdate', 'Remove Library')
+    .option('-AS, --addStruct', 'Adds Directory Structures')
     .parse(process.argv);
 
 /**
@@ -40,6 +41,7 @@ if (mArgv.lib) {
     });
     return;
 }
+
 
 
 /**
@@ -93,6 +95,26 @@ if (mArgv.libRemove) {
  */
 if (mArgv.libUpdate) {
     execCmd('ncu -u --loglevel verbose --packageFile package.json');
+    // execCmd('npm update');
+    return;
+}
+
+/**
+ * trigger with flag --addStruct
+ * Adds Manually Created Json based directoryStructure in directoryStructure Library
+ */
+if (mArgv.addStruct) {
+    var src = mArgv.addStruct;
+    var dst = path.resolve(__dirname, "lib/projectStructure", path.basename(src));
+
+    if (path.extname(src).toLowerCase() == '.json') {
+        if (path.isAbsolute(src))
+            copyFile(src, dst);
+        else
+            copyFile(path.join(process.cwd(), src), dst);
+    }
+    else
+        console.log("Error: Not a Json File");
     return;
 }
 
