@@ -18,6 +18,7 @@ program.version('v0.0.1')
     .option('-LR, --libUpdate', 'Remove Library')
     .option('-AS, --addStruct', 'Adds Directory Structures')
     .option('-LL, --libList', 'Displays List of Avialbale Libraries')
+    .option('-LL, --projList', 'Displays List of Avialbale Project Structure')
     .parse(process.argv);
 
 /**
@@ -118,8 +119,23 @@ if (mArgv.addStruct) {
     return;
 }
 
+
+/**
+ * trigger with flag --libList
+ * Lists The Available Packages in Library
+ */
 if (mArgv.libList) {
     getLibList();
+    return;
+}
+
+
+/**
+ * trigger with flag --projList
+ * Lists The Available Project Structures
+ */
+if (mArgv.projList) {
+    getProjList();
     return;
 }
 updateFileMap(); //Updates The Template fileMap
@@ -205,6 +221,22 @@ function getLibList() {
             console.log("No Avialbale Libraries");
         }
         return;
+    });
+}
+
+/**
+ * Lists the avilable Project Structure
+ */
+function getProjList () { 
+    fs.readdir(__dirname + "/lib/projectStructure/", function (err,list) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        console.log("Avilable Project Structures Are:-");
+        list.forEach(function (item) {
+            console.log(item.slice(0,item.lastIndexOf('.')));
+        });
     });
 }
 
