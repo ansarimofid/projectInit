@@ -17,6 +17,7 @@ program.version('v0.0.1')
     .option('-LR, --libRemove', 'Remove Library from Collection')
     .option('-LR, --libUpdate', 'Remove Library')
     .option('-AS, --addStruct', 'Adds Directory Structures')
+    .option('-LL, --libList', 'Displays List of Avialbale Libraries')
     .parse(process.argv);
 
 /**
@@ -112,12 +113,15 @@ if (mArgv.addStruct) {
             copyFile(src, dst);
         else
             copyFile(path.join(process.cwd(), src), dst);
-    }
-    else
+    } else
         console.log("Error: Not a Json File");
     return;
 }
 
+if (mArgv.libList) {
+    getLibList();
+    return;
+}
 updateFileMap(); //Updates The Template fileMap
 
 /**
@@ -179,6 +183,28 @@ function loadJson(path, callback) {
         }
         struct = JSON.parse(data);
         callback(null, struct);
+    });
+}
+
+/**
+ * Print The List of Available Libraries
+ */
+function getLibList() {
+    loadJson(path.resolve(__dirname, 'package.json'), function(err, data) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        if (data.dependencies) {
+            console.log("\tList of Libraries");
+            console.log("Library \t\t Version");
+            for (var lib in data.dependencies) {
+                console.log(lib + '\t\t' + data.dependencies[lib]);
+            }
+        } else {
+            console.log("No Avialbale Libraries");
+        }
+        return;
     });
 }
 
